@@ -16,6 +16,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
 public class User implements UserDetails {
 
     @Id
@@ -28,12 +29,18 @@ public class User implements UserDetails {
     private boolean isEmailVerified = false;
     private String emailVerificationToken;
     private boolean isBlocked = false;
+    private String profileImage;
     private Date joinDate;
     @Enumerated(EnumType.STRING)
     private Role role;
     @Override
     public Collection < ? extends GrantedAuthority > getAuthorities ( ) {
         return List.of ( new SimpleGrantedAuthority ( role.name ( ) ) );
+    }
+
+    @Override
+    public String getPassword ( ) {
+        return password;
     }
 
     @Override

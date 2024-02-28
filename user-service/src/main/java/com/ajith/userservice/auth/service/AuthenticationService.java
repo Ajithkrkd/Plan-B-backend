@@ -69,7 +69,7 @@ public class AuthenticationService {
             }
             if(!user.isEmailVerified ())
             {
-                System.out.println ("Worker is not----------------------------------------" );
+                System.out.println ("User is not----------------------------------------" );
                 throw new EmailNotVerifiedException ("email verification failed");
             }
             var jwtToken = jwtService.generateToken(user);

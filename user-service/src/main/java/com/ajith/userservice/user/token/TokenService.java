@@ -35,4 +35,11 @@ public class TokenService {
                     .build ();
             tokenRepository.save ( token );
     }
+
+    public boolean checkRefreshTokenValidOrNot (String refreshToken) {
+        return tokenRepository.findByToken ( refreshToken )
+                .map ( token -> token.isRefreshToken () &&
+                        !token.isExpired ( ) &&
+                        !token.isRevoked ( )).orElse ( false );
+    }
 }

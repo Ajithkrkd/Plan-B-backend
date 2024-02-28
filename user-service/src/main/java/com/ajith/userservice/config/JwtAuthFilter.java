@@ -71,7 +71,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             }
         }
 
-        System.out.println("Response Status Code: " + response.getStatus());
+        System.out.println("Response Status Code: " + response.getStatus() + "ajith");
         filterChain.doFilter(request, response);
     }
 }
