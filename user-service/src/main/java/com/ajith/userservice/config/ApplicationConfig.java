@@ -1,5 +1,5 @@
 package com.ajith.userservice.config;
-import com.ajith.userservice.repository.UserRepository;
+import com.ajith.userservice.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

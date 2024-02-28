@@ -5,11 +5,11 @@ import lombok.*;
 
 @Getter
 @Setter
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class LoginResponse extends BasicResponse {
-
+@Builder
+public class LoginResponse{
     private String access_token;
     private String refresh_token;
+    private BasicResponse message;
 }

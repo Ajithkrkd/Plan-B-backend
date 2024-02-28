@@ -1,4 +1,4 @@
-package com.ajith.userservice.model;
+package com.ajith.userservice.user.model;
 
 import lombok.Getter;
 

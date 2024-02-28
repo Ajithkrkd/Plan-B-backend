@@ -4,17 +4,15 @@ import com.ajith.userservice.auth.dto.LoginRequest;
 import com.ajith.userservice.auth.dto.LoginResponse;
 import com.ajith.userservice.auth.dto.RegistrationRequest;
 import com.ajith.userservice.auth.service.AuthenticationService;
-import com.ajith.userservice.service.IuserService;
+import com.ajith.userservice.kafka.event.UserEmailTokenEvent;
+import com.ajith.userservice.kafka.service.KafkaProducer;
+import com.ajith.userservice.kafka.service.UserEmailEventService;
+import com.ajith.userservice.user.service.IUserService;
 import com.ajith.userservice.utils.BasicResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 
@@ -23,8 +21,10 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class AuthenticationController {
 
-    private final IuserService userService;
+    private final IUserService userService;
     private final AuthenticationService authenticationService;
+    private final KafkaProducer kafkaProducer;
+    private final UserEmailEventService userEmailEventService;
     @PostMapping("/register")
     public ResponseEntity<BasicResponse> registerUser(@RequestBody RegistrationRequest request)
     {
@@ -39,8 +39,9 @@ public class AuthenticationController {
                                 .status ( HttpStatus.CONFLICT.value ( ) )
                                 .build());
             }
-
             ResponseEntity<BasicResponse> response = authenticationService.register(request);
+            UserEmailTokenEvent event = userEmailEventService.createUserEmailEvent(request);
+            kafkaProducer.sentMessage (event);
             return response;
         } catch (Exception e) {
 
@@ -55,19 +56,20 @@ public class AuthenticationController {
     }
 
 
+
+
     @PostMapping("/login")
-    public ResponseEntity < LoginResponse > login(@RequestBody LoginRequest request
-    ){
-
-
-        try {
+    public ResponseEntity < LoginResponse > login(@RequestBody LoginRequest request){
             LoginResponse response = authenticationService.login(request);
             return ResponseEntity.ok(response);
-        }
-        catch (Exception e)
-        {
-            throw new RuntimeException (e.getMessage ());
-        }
+    }
+
+
+    @PostMapping("/confirm-email/{token}")
+    public ResponseEntity<BasicResponse>confirmUserEmail(
+            @PathVariable String token)
+    {
+        return authenticationService.confirmEmailWithToken (token);
     }
 
 }
