@@ -3,6 +3,7 @@ package com.ajith.userservice.GlobalExceptionHandler;
 import com.ajith.userservice.GlobalExceptionHandler.Exceptions.EmailAlreadyExistsException;
 import com.ajith.userservice.GlobalExceptionHandler.Exceptions.EmailNotVerifiedException;
 import com.ajith.userservice.GlobalExceptionHandler.Exceptions.UserBlockedException;
+import com.ajith.userservice.GlobalExceptionHandler.Exceptions.UserNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -36,6 +37,16 @@ public class ControllerExceptionHandler {
         return message;
     }
 
+    @ExceptionHandler (value = {UserNotFoundException.class})
+    @ResponseStatus (value = HttpStatus.BAD_REQUEST)
+    public ErrorMessage UserNotFountException(UserNotFoundException ex ,WebRequest request) {
+        ErrorMessage message = new ErrorMessage();
+        message.setStatus (HttpStatus.BAD_REQUEST.value ());
+        message.setMessage ( ex.getMessage() );
+        message.setDescription ( " unable to find the user check end point request others" );
+        message.setTimestamp ( LocalDateTime.now ( ) );
+        return message;
+    }
 
     @ExceptionHandler(value = {EmailAlreadyExistsException.class})
     @ResponseStatus(value = HttpStatus.CONFLICT)

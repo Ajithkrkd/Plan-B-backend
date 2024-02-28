@@ -10,8 +10,9 @@ import java.util.function.Predicate;
 public class RouteValidator {
 
     public static final List<String>WHITELIST = List.of (
-            "/api/auth/register",
+            "/api/auth/**",
             "/api/auth/login",
+            "/api/auth/confirm-email/**",
             "/eureka"
     );
 

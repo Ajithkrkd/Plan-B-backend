@@ -1,6 +1,6 @@
-package com.ajith.userservice.token;
+package com.ajith.userservice.user.token;
 
-import com.ajith.userservice.model.User;
+import com.ajith.userservice.user.model.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

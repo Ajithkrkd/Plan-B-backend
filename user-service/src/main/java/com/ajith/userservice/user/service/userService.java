@@ -1,7 +1,7 @@
-package com.ajith.userservice.service;
+package com.ajith.userservice.user.service;
 
-import com.ajith.userservice.model.User;
-import com.ajith.userservice.repository.UserRepository;
+import com.ajith.userservice.user.model.User;
+import com.ajith.userservice.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

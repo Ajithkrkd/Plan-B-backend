@@ -1,5 +1,5 @@
-package com.ajith.userservice.token;
-import com.ajith.userservice.model.User;
+package com.ajith.userservice.user.token;
+import com.ajith.userservice.user.model.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

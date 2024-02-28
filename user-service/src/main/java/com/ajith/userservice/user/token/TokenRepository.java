@@ -1,4 +1,4 @@
-package com.ajith.userservice.token;
+package com.ajith.userservice.user.token;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

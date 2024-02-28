@@ -2,15 +2,15 @@ package com.ajith.userservice.auth.service;
 
 import com.ajith.userservice.GlobalExceptionHandler.Exceptions.EmailNotVerifiedException;
 import com.ajith.userservice.GlobalExceptionHandler.Exceptions.UserBlockedException;
+import com.ajith.userservice.GlobalExceptionHandler.Exceptions.UserNotFoundException;
 import com.ajith.userservice.auth.dto.LoginRequest;
 import com.ajith.userservice.auth.dto.LoginResponse;
 import com.ajith.userservice.auth.dto.RegistrationRequest;
 import com.ajith.userservice.config.JwtService;
-import com.ajith.userservice.kafka.event.UserEmailTokenEvent;
-import com.ajith.userservice.model.Role;
-import com.ajith.userservice.model.User;
-import com.ajith.userservice.repository.UserRepository;
-import com.ajith.userservice.token.TokenService;
+import com.ajith.userservice.user.model.Role;
+import com.ajith.userservice.user.model.User;
+import com.ajith.userservice.user.repository.UserRepository;
+import com.ajith.userservice.user.token.TokenService;
 import com.ajith.userservice.utils.BasicResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -24,7 +24,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.Date;
-import java.util.UUID;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -95,29 +95,34 @@ public class AuthenticationService {
         }
     }
 
-    public UserEmailTokenEvent createUserEmailEvent (RegistrationRequest request) {
-        var token = getEmailVerificationToken(request.getEmail ());
-        return UserEmailTokenEvent.builder ( )
-                .email ( request.getEmail ( ) )
-                .fullName ( request.getFullName ( ) )
-                .token ( token ).build ( );
-    }
+    public ResponseEntity< BasicResponse> confirmEmailWithToken (String token) {
 
-    private String getEmailVerificationToken (String email) {
-       String token = createEmailVerificationToken (email);
-        saveEmailVerificationTokenToUser (email,token);
-        return token;
-    }
+        try {
+            Optional<User> userWithToken = userRepository.findByEmailVerificationToken ( token );
+            if ( userWithToken.isPresent())
+            {
+                User user = userWithToken.get ();
+                user.setEmailVerified ( true );
+                userRepository.save ( user );
 
-    private String createEmailVerificationToken ( String email ) {
-        return UUID.randomUUID ().toString ();
-    }
+                return ResponseEntity.status ( HttpStatus.OK )
+                        .body ( BasicResponse.builder ()
+                                .message ( "Verification Success" )
+                                .description ( "Verification success with token worker is confirmed" )
+                                .status ( HttpStatus.OK.value ( ) )
+                                .timestamp ( LocalDateTime.now () )
+                                .build ()
+                        );
+            }
+            else {
+                throw new UserNotFoundException ("user with token " + token + " not found");
+            }
+        }
+        catch ( Exception e)
+        {
+            throw new RuntimeException ( e.getMessage ());
+        }
 
 
-    private void saveEmailVerificationTokenToUser (String email,String token) {
-        var user = userRepository.findByEmail ( email )
-                .orElseThrow (()->new UsernameNotFoundException ( "user not fount with email" + email ));
-        user.setEmailVerificationToken ( token );
-        userRepository.save ( user );
     }
 }

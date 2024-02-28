@@ -1,6 +1,6 @@
 package com.ajith.userservice.config;
 
-import com.ajith.userservice.model.Role;
+import com.ajith.userservice.user.model.Role;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -10,10 +10,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -25,6 +21,7 @@ public class SecurityConfig{
             {
                     "/api/auth/register/**",
                     "/api/auth/login/**",
+                    "/api/auth/confirm-email/**"
             };
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {

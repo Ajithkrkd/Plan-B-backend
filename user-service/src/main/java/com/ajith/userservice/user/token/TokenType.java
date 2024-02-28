@@ -1,4 +1,4 @@
-package com.ajith.userservice.token;
+package com.ajith.userservice.user.token;
 
 import lombok.Getter;
 
