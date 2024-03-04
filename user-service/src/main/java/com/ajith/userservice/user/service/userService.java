@@ -69,9 +69,8 @@ public class userService implements IUserService{
             Optional < User > optionalUser = userRepository.findByEmail ( userEmail );
             if ( optionalUser.isPresent ( ) ) {
                 User validUser = optionalUser.get ( );
-                String encodedCurrentPassword = validUser.getPassword ( );
-                String userEnteredCurrentPassword = passwordEncoder.encode ( changePasswordRequest.getCurrentPassword ( ) );
-                if ( encodedCurrentPassword.equals ( userEnteredCurrentPassword ) ) {
+
+                if ( passwordEncoder.matches ( changePasswordRequest.getCurrentPassword () , validUser.getPassword ( ) ) ) {
                     validUser.setPassword ( passwordEncoder.encode ( changePasswordRequest.getNewPassword ( ) ) );
                     userRepository.save ( validUser );
                     return ResponseEntity.status ( HttpStatus.OK ).body ( BasicResponse
