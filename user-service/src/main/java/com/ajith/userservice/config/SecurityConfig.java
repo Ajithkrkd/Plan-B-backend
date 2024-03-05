@@ -21,7 +21,8 @@ public class SecurityConfig{
     private final JwtAuthFilter authFilter;
     private static final String[] WHITE_LIST_URLS =
             {
-                    "/user/api/auth/**"
+                    "/user/api/auth/**",
+                    "/uploads/**"
 
             };
     @Bean
