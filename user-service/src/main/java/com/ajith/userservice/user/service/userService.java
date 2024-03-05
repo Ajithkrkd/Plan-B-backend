@@ -1,6 +1,7 @@
 package com.ajith.userservice.user.service;
 
 import com.ajith.userservice.GlobalExceptionHandler.Exceptions.UserNotFoundException;
+import com.ajith.userservice.config.JwtService;
 import com.ajith.userservice.user.dto.ChangePasswordRequest;
 import com.ajith.userservice.user.dto.UserDetailsResponse;
 import com.ajith.userservice.user.dto.UserUpdateRequest;
@@ -26,6 +27,8 @@ public class userService implements IUserService{
 
     private  final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private  final FileUploadService fileUploadService;
+    private final JwtService jwtService;
 
     @Override
     public boolean isEmailExist (String email) {
@@ -39,23 +42,23 @@ public class userService implements IUserService{
 
     @Override
     public ResponseEntity < BasicResponse > addProfileImageForUser
-            (String userEmail, MultipartFile imageFile) throws IOException {
+            (String authHeader, MultipartFile imageFile) throws IOException {
         try {
 
-            Optional<User> optionalUser = userRepository.findByEmail ( userEmail );
+            Optional<User> optionalUser = jwtService.findUserWithAuthHeader ( authHeader );
             if( optionalUser.isPresent ( ) ){
                 User validUser = optionalUser.get();
-                String fileName = FileUploadService.uploadFile(imageFile);
+                String fileName = fileUploadService.uploadImageAndSaveImagePathToUser (imageFile);
                 validUser.setProfileImage("/uploads"+"/"+fileName);
                 userRepository.save(validUser);
                 return ResponseEntity.ok(BasicResponse.builder ( )
                                 .message ( "Successfully added profile image" )
-                                .description ( "profile image uploaded to user "+ userEmail )
+                                .description ( "profile image uploaded to user " )
                                 .timestamp ( LocalDateTime.now () )
                                 .status ( HttpStatus.OK.value ( ) )
                         .build ( ) );
             }else{
-                throw new UserNotFoundException ( "User " + userEmail + "not found");
+                throw new UserNotFoundException ( "User doest not found");
             }
 
         }catch (UserNotFoundException e){
@@ -69,9 +72,8 @@ public class userService implements IUserService{
             Optional < User > optionalUser = userRepository.findByEmail ( userEmail );
             if ( optionalUser.isPresent ( ) ) {
                 User validUser = optionalUser.get ( );
-                String encodedCurrentPassword = validUser.getPassword ( );
-                String userEnteredCurrentPassword = passwordEncoder.encode ( changePasswordRequest.getCurrentPassword ( ) );
-                if ( encodedCurrentPassword.equals ( userEnteredCurrentPassword ) ) {
+
+                if ( passwordEncoder.matches ( changePasswordRequest.getCurrentPassword () , validUser.getPassword ( ) ) ) {
                     validUser.setPassword ( passwordEncoder.encode ( changePasswordRequest.getNewPassword ( ) ) );
                     userRepository.save ( validUser );
                     return ResponseEntity.status ( HttpStatus.OK ).body ( BasicResponse
@@ -105,16 +107,16 @@ public class userService implements IUserService{
     }
 
     @Override
-    public ResponseEntity < UserDetailsResponse > getUserDetails (String userEmail) {
+    public ResponseEntity < UserDetailsResponse > getUserDetails (String authHeader) {
 
         try{
-            Optional<User> optionalUser = userRepository.findByEmail ( userEmail );
+            Optional<User> optionalUser = jwtService.findUserWithAuthHeader ( authHeader );
             if( optionalUser.isPresent ( ) ){
                 User validUser = optionalUser.get();
                 return getUserDetailsResponseResponseEntity ( validUser );
 
             }else{
-                throw new UserNotFoundException ( "User " + userEmail + "  does not exist"  );
+                throw new UserNotFoundException ( "User doest not exist with your token " );
             }
         }catch (UserNotFoundException e){
             throw new RuntimeException ( e.getMessage () );
@@ -138,15 +140,15 @@ public class userService implements IUserService{
     }
 
     @Override
-    public ResponseEntity < BasicResponse > updateUserDetails (UserUpdateRequest userUpdateRequest, String userEmail) {
+    public ResponseEntity < BasicResponse > updateUserDetails (UserUpdateRequest userUpdateRequest, String authHeader) {
         try{
-            Optional<User> optionalUser = userRepository.findByEmail ( userEmail );
+            Optional<User> optionalUser = jwtService.findUserWithAuthHeader ( authHeader );
             if( optionalUser.isPresent ( ) ){
                 User validUser = optionalUser.get();
                 return updateUserDetailsWithNewData ( validUser, userUpdateRequest );
 
             }else{
-                throw new UserNotFoundException ( "User " + userEmail + "  does not exist"  );
+                throw new UserNotFoundException ( "User  does not exist"  );
             }
         }catch (UserNotFoundException e){
             throw new RuntimeException ( e.getMessage () );

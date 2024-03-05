@@ -13,44 +13,45 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 
 @RestController
-@RequestMapping("/api/user")
+@RequestMapping("/user/api/secure")
 @RequiredArgsConstructor
 public class UserController {
 
     private final IUserService iUserService;
-    @PostMapping("/{userEmail}/add_profile_image")
+    @PostMapping("/add_profile_image")
     public ResponseEntity< BasicResponse > addProfileImageForUser(
-            @PathVariable("userEmail") String userEmail,
+            @RequestHeader("Authorization") String authHeader,
             @RequestParam("file") MultipartFile file) throws IOException {
-        return  iUserService.addProfileImageForUser(userEmail ,file);
+        return  iUserService.addProfileImageForUser(authHeader ,file);
     }
 
-    @PostMapping("/{userEmail}/update_user_details")
+    @PostMapping("/update_user_details")
     public ResponseEntity< BasicResponse > updateUserDetails(
-            @PathVariable String userEmail,
+            @RequestHeader("Authorization") String authHeader,
             @RequestBody UserUpdateRequest userUpdateRequest)
     {
-        return iUserService.updateUserDetails(userUpdateRequest,userEmail);
+        return iUserService.updateUserDetails(userUpdateRequest,authHeader);
     }
 
-    @GetMapping("/{userEmail}/get_user_details")
-    public ResponseEntity< UserDetailsResponse > getUserDetails(@PathVariable String userEmail)
+    @GetMapping("/get_user_details")
+    public ResponseEntity< UserDetailsResponse > getUserDetails(
+            @RequestHeader("Authorization") String authHeader)
     {
-        System.out.println ("from here " );
-        return iUserService.getUserDetails(userEmail);
+        return iUserService.getUserDetails(authHeader);
     }
 
-    @PostMapping("/{userEmail}/change_password")
+    @PostMapping("/change_password")
     public ResponseEntity<BasicResponse>changePassword(
-            @PathVariable String userEmail,
+            @RequestHeader String authHeader,
             @RequestBody ChangePasswordRequest changePasswordRequest){
-        return iUserService.changePassword(userEmail,changePasswordRequest);
+        return iUserService.changePassword(authHeader
+                ,changePasswordRequest);
     }
 
     //TODO: service not implemented
-    @PostMapping("/{userEmail}/forgot_password")
+    @PostMapping("/forgot_password")
     public ResponseEntity<BasicResponse>forgot_password(
-            @PathVariable String userEmail){
-        return iUserService.forgot_password(userEmail);
+            @RequestHeader String authHeader){
+        return iUserService.forgot_password(authHeader);
     }
 }

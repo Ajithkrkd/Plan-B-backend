@@ -21,19 +21,21 @@ public class SecurityConfig{
     private final JwtAuthFilter authFilter;
     private static final String[] WHITE_LIST_URLS =
             {
-                    "/api/auth/**"
+                    "/user/api/auth/**",
+                    "/uploads/**"
 
             };
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        return http.csrf ( AbstractHttpConfigurer::disable )
+        return http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .csrf(AbstractHttpConfigurer::disable)
+                .cors(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests ( auth ->{
                     auth.requestMatchers (WHITE_LIST_URLS )
                             .permitAll ()
-                            .requestMatchers ( "/api/user/**" ).hasAnyAuthority ( Role.USER.name () )
+                            .requestMatchers ( "/user/api/secure/" ).hasAnyAuthority ( Role.USER.name () )
                             .anyRequest ().authenticated ();
                 })
-                .sessionManagement ( session->session.sessionCreationPolicy ( SessionCreationPolicy.STATELESS ))
                 .authenticationProvider ( authenticationProvider )
                 .addFilterBefore ( authFilter , UsernamePasswordAuthenticationFilter.class)
                 .build ();

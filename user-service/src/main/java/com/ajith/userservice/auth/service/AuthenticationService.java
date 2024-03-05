@@ -2,6 +2,7 @@ package com.ajith.userservice.auth.service;
 
 import com.ajith.userservice.GlobalExceptionHandler.Exceptions.EmailNotVerifiedException;
 import com.ajith.userservice.GlobalExceptionHandler.Exceptions.UserBlockedException;
+import com.ajith.userservice.GlobalExceptionHandler.Exceptions.CustomBadcredentialException;
 import com.ajith.userservice.GlobalExceptionHandler.Exceptions.UserNotFoundException;
 import com.ajith.userservice.auth.dto.LoginRequest;
 import com.ajith.userservice.auth.dto.LoginResponse;
@@ -69,7 +70,6 @@ public class AuthenticationService {
             }
             if(!user.isEmailVerified ())
             {
-                System.out.println ("User is not----------------------------------------" );
                 throw new EmailNotVerifiedException ("email verification failed");
             }
             var jwtToken = jwtService.generateToken(user);
@@ -89,9 +89,12 @@ public class AuthenticationService {
             throw new EmailNotVerifiedException ( e.getMessage () );
         }
         catch (BadCredentialsException e) {
-            throw new BadCredentialsException ("Password is Wrong");
+            throw new CustomBadcredentialException ("email or password is incorrect");
         } catch (UsernameNotFoundException e) {
             throw new UsernameNotFoundException("Worker not found");
+        }
+        catch (Exception e){
+        throw new RuntimeException (e.getMessage ());
         }
     }
 

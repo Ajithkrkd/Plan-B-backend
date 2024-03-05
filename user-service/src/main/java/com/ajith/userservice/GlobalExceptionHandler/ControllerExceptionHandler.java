@@ -90,6 +90,16 @@ public class ControllerExceptionHandler {
         return message;
     }
 
-
+    @ExceptionHandler(value = {CustomBadcredentialException.class})
+    @ResponseStatus(value = HttpStatus.FORBIDDEN)
+    public ErrorMessage customBadCredentialException(CustomBadcredentialException ex,WebRequest request)
+    {
+        ErrorMessage message = new ErrorMessage();
+        message.setStatus (HttpStatus.FORBIDDEN.value ());
+        message.setMessage ( ex.getMessage() );
+        message.setDescription ( "Your credential have mismatch take a look" );
+        message.setTimestamp ( LocalDateTime.now ( ) );
+        return message;
+    }
 
 }

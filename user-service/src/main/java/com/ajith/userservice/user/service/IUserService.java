@@ -14,13 +14,13 @@ import java.util.Optional;
 public interface IUserService {
     boolean isEmailExist (String email);
     Optional< User > findByEmail (String email);
-    ResponseEntity< BasicResponse > addProfileImageForUser (String userEmail, MultipartFile file) throws IOException;
+    ResponseEntity< BasicResponse > addProfileImageForUser (String authHeader, MultipartFile file) throws IOException;
 
-    ResponseEntity< BasicResponse> changePassword (String userEmail, ChangePasswordRequest changePasswordRequest);
+    ResponseEntity< BasicResponse> changePassword (String authHeader, ChangePasswordRequest changePasswordRequest);
 
-    ResponseEntity< BasicResponse> forgot_password (String userEmail);
+    ResponseEntity< BasicResponse> forgot_password (String authHeader);
 
-    ResponseEntity< UserDetailsResponse > getUserDetails (String userEmail);
+    ResponseEntity< UserDetailsResponse > getUserDetails (String authHeader);
 
-    ResponseEntity< BasicResponse> updateUserDetails (UserUpdateRequest userUpdateRequest, String userEmail);
+    ResponseEntity< BasicResponse> updateUserDetails (UserUpdateRequest userUpdateRequest, String authHeader);
 }

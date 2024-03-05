@@ -1,10 +1,14 @@
 package com.ajith.userservice.config;
 
+import com.ajith.userservice.user.model.User;
+import com.ajith.userservice.user.repository.UserRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -15,6 +19,8 @@ import java.util.*;
 import java.util.function.Function;
 
 @Service
+@Slf4j
+@RequiredArgsConstructor
 public class JwtService {
     @Value ( "${application.security.jwt.secret-key}" )
     private String secretKey;
@@ -24,6 +30,7 @@ public class JwtService {
     @Value ( "${application.security.jwt.refresh-token.expiration}" )
     private long refreshExpiration ;
 
+    private final UserRepository userRepository;
     public String extractUsername (String token) {
         return extractClaim (token, Claims::getSubject);
     }
@@ -98,4 +105,11 @@ public class JwtService {
     }
 
 
+    public Optional< User> findUserWithAuthHeader (String authHeader) {
+        String token = authHeader.substring ( 7 );
+            log.info ( "Found token from authHeader "+ token );
+        String  userEmail = extractUsername ( token );
+            log.info ( "extracted user name form token  "+ userEmail );
+        return Optional.ofNullable ( userRepository.findByEmail ( userEmail ).orElse ( null ) );
+    }
 }

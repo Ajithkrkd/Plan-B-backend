@@ -3,6 +3,7 @@ package com.ajith.userservice.user.dto;
 import com.ajith.userservice.user.model.Role;
 import lombok.*;
 
+import java.util.Date;
 import java.util.List;
 
 @Getter
@@ -19,4 +20,5 @@ public class UserDetailsResponse {
     private boolean isEmailVerified;
     private String profile_image_path;
     private boolean isBlocked;
+    private Date joinDate;
 }
