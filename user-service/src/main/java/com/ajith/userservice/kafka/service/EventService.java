@@ -1,6 +1,7 @@
 package com.ajith.userservice.kafka.service;
 
 import com.ajith.userservice.auth.dto.RegistrationRequest;
+import com.ajith.userservice.kafka.event.ForgottenPasswordEvent;
 import com.ajith.userservice.kafka.event.UserEmailTokenEvent;
 import com.ajith.userservice.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -12,13 +13,14 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public class UserEmailEventService {
+public class EventService {
 
 
     private final UserRepository userRepository;
     @Value ( "${user.email.verification.link}" )
     private String confirmation_link;
-
+    @Value ( "${user.forgotten.password.link}" )
+    private String forgottenPassword_link;
 
     public UserEmailTokenEvent createUserEmailEvent (RegistrationRequest request) {
         var token = getEmailVerificationToken(request.getEmail ());
@@ -29,7 +31,15 @@ public class UserEmailEventService {
                 .confirmation_link ( confirmation_link )
                 .build ( );
     }
-
+    public ForgottenPasswordEvent createForgottenPasswordEvent (String email, String fullName) {
+        var token = getEmailVerificationToken(email);
+        return ForgottenPasswordEvent.builder ( )
+                .email ( email )
+                .fullName ( fullName )
+                .token ( token )
+                .confirmation_link ( forgottenPassword_link )
+                .build ( );
+    }
     private String getEmailVerificationToken (String email) {
         String token = createEmailVerificationToken (email);
         saveEmailVerificationTokenToUser (email,token);
@@ -44,7 +54,7 @@ public class UserEmailEventService {
     private void saveEmailVerificationTokenToUser (String email,String token) {
         var user = userRepository.findByEmail ( email )
                 .orElseThrow (()->new UsernameNotFoundException ( "user not fount with email" + email ));
-        user.setEmailVerificationToken ( token );
+        user.setVerificationToken ( token );
         userRepository.save ( user );
     }
 

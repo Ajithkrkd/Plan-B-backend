@@ -1,5 +1,6 @@
 package com.ajith.userservice.kafka.service;
 
+import com.ajith.userservice.kafka.event.ForgottenPasswordEvent;
 import com.ajith.userservice.kafka.event.UserEmailTokenEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +25,21 @@ public class KafkaProducer {
                     .build ();
             kafkaTemplate.send ( message );
             log.info ( "email verification event produced"+ event );
+        }
+        catch (Exception e) {
+            log.error("Error occurred while sending message to Kafka: {}", e.getMessage(), e);
+            // Handle the exception as needed
+        }
+    }
+
+    public void publishForgottenPassword(ForgottenPasswordEvent event) {
+        try{
+            Message < ForgottenPasswordEvent > message = MessageBuilder
+                    .withPayload ( event )
+                    .setHeader ( KafkaHeaders.TOPIC,"forgotten-password-topic" )
+                    .build ();
+            kafkaTemplate.send ( message );
+            log.info ( "forgotten password  event published "+ event );
         }
         catch (Exception e) {
             log.error("Error occurred while sending message to Kafka: {}", e.getMessage(), e);

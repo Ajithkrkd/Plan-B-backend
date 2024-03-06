@@ -101,5 +101,15 @@ public class ControllerExceptionHandler {
         message.setTimestamp ( LocalDateTime.now ( ) );
         return message;
     }
-
+    @ExceptionHandler(value = {ForgotPasswordTokenInvalidException.class})
+    @ResponseStatus(value = HttpStatus.NOT_ACCEPTABLE)
+    public ErrorMessage forgotPasswordTokenInvalidException(ForgotPasswordTokenInvalidException ex,WebRequest request)
+    {
+        ErrorMessage message = new ErrorMessage();
+        message.setStatus (HttpStatus.NOT_ACCEPTABLE.value ());
+        message.setMessage ( ex.getMessage() );
+        message.setDescription ( "You have clicked wrong mail please check mail with current time or try another one " );
+        message.setTimestamp ( LocalDateTime.now ( ) );
+        return message;
+    }
 }

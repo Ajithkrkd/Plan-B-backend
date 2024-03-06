@@ -1,6 +1,7 @@
 package com.ajith.userservice.user.service;
 
 import com.ajith.userservice.user.dto.ChangePasswordRequest;
+import com.ajith.userservice.user.dto.ForgotPasswordRequest;
 import com.ajith.userservice.user.dto.UserDetailsResponse;
 import com.ajith.userservice.user.dto.UserUpdateRequest;
 import com.ajith.userservice.user.model.User;
@@ -18,9 +19,11 @@ public interface IUserService {
 
     ResponseEntity< BasicResponse> changePassword (String authHeader, ChangePasswordRequest changePasswordRequest);
 
-    ResponseEntity< BasicResponse> forgot_password (String authHeader);
+    ResponseEntity< BasicResponse> getForgotPasswordLink (String userEmail);
 
     ResponseEntity< UserDetailsResponse > getUserDetails (String authHeader);
 
     ResponseEntity< BasicResponse> updateUserDetails (UserUpdateRequest userUpdateRequest, String authHeader);
+
+    ResponseEntity< BasicResponse> forgot_password (ForgotPasswordRequest forgotPasswordRequest);
 }

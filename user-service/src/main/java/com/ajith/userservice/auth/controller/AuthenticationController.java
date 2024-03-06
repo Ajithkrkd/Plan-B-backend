@@ -6,7 +6,8 @@ import com.ajith.userservice.auth.dto.RegistrationRequest;
 import com.ajith.userservice.auth.service.AuthenticationService;
 import com.ajith.userservice.kafka.event.UserEmailTokenEvent;
 import com.ajith.userservice.kafka.service.KafkaProducer;
-import com.ajith.userservice.kafka.service.UserEmailEventService;
+import com.ajith.userservice.kafka.service.EventService;
+import com.ajith.userservice.user.dto.ForgotPasswordRequest;
 import com.ajith.userservice.user.service.IUserService;
 import com.ajith.userservice.utils.BasicResponse;
 import lombok.RequiredArgsConstructor;
@@ -20,11 +21,10 @@ import java.time.LocalDateTime;
 @RequestMapping("/user/api/auth")
 @RequiredArgsConstructor
 public class AuthenticationController {
-
     private final IUserService userService;
     private final AuthenticationService authenticationService;
     private final KafkaProducer kafkaProducer;
-    private final UserEmailEventService userEmailEventService;
+    private final EventService eventService;
     @PostMapping("/register")
     public ResponseEntity<BasicResponse> registerUser(@RequestBody RegistrationRequest request)
     {
@@ -40,7 +40,8 @@ public class AuthenticationController {
                                 .build());
             }
             ResponseEntity<BasicResponse> response = authenticationService.register(request);
-            UserEmailTokenEvent event = userEmailEventService.createUserEmailEvent(request);
+            //kafka publish
+            UserEmailTokenEvent event = eventService.createUserEmailEvent(request);
             kafkaProducer.sentMessage (event);
             return response;
         } catch (Exception e) {
@@ -72,4 +73,16 @@ public class AuthenticationController {
         return authenticationService.confirmEmailWithToken (token);
     }
 
+    @PostMapping("/get_forgot_password_link/{userEmail}")
+    public ResponseEntity<BasicResponse>getForgot_passwordLink(
+            @PathVariable ("userEmail") String userEmail){
+
+        return userService.getForgotPasswordLink(userEmail);
+    }
+    @PostMapping("/forgot_password")
+    public ResponseEntity<BasicResponse>forgot_password(
+            @RequestBody ForgotPasswordRequest forgotPasswordRequest){
+
+        return userService.forgot_password (forgotPasswordRequest);
+    }
 }
