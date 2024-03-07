@@ -209,6 +209,24 @@ public class userService implements IUserService{
         }
     }
 
+    @Override
+    public ResponseEntity < UserDetailsResponse > getUserByAuthHeader (String authHeader) {
+        try{
+            Optional<User> optionalUser = jwtService.findUserWithAuthHeader ( authHeader );
+            if( optionalUser.isPresent ( ) ){
+                User validUser = optionalUser.get();
+                return  getUserDetailsResponseResponseEntity ( validUser );
+
+            }else{
+                throw new UserNotFoundException ( "User  does not exist"  );
+            }
+        }catch (UserNotFoundException e){
+            throw new RuntimeException ( e.getMessage () );
+        }catch (Exception e){
+            throw new RuntimeException ( e.getMessage () );
+        }
+    }
+
     private ResponseEntity< BasicResponse> updatePasswordWithNewOne (ForgotPasswordRequest forgotPasswordRequest, User validUser) {
         validUser.setPassword ( passwordEncoder.encode ( forgotPasswordRequest.getNewPassword () ) );
         userRepository.save ( validUser );

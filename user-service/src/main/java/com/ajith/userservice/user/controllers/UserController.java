@@ -1,7 +1,6 @@
 package com.ajith.userservice.user.controllers;
 
 import com.ajith.userservice.user.dto.ChangePasswordRequest;
-import com.ajith.userservice.user.dto.ForgotPasswordRequest;
 import com.ajith.userservice.user.dto.UserDetailsResponse;
 import com.ajith.userservice.user.dto.UserUpdateRequest;
 import com.ajith.userservice.user.service.IUserService;
@@ -47,6 +46,8 @@ public class UserController {
             @RequestBody ChangePasswordRequest changePasswordRequest){
         return iUserService.changePassword(authHeader,changePasswordRequest);
     }
+
+
 
 
 }

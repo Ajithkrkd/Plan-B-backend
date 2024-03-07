@@ -26,4 +26,6 @@ public interface IUserService {
     ResponseEntity< BasicResponse> updateUserDetails (UserUpdateRequest userUpdateRequest, String authHeader);
 
     ResponseEntity< BasicResponse> forgot_password (ForgotPasswordRequest forgotPasswordRequest);
+
+    ResponseEntity < UserDetailsResponse > getUserByAuthHeader (String authHeader);
 }

@@ -1,0 +1,25 @@
+server:
+  port: 8082
+spring:
+  application:
+    name: project-service
+  datasource:
+    url: jdbc:mysql://localhost:3309/plan_b_project
+    username: root
+    password: password#2#2
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+    hibernate:
+      ddl-auto: update
+  #kafka configuration
+  kafka:
+    producer:
+      bootstrap-servers: localhost:9092
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
