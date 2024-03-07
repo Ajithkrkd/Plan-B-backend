@@ -1,33 +1,6 @@
-server:
-  port: 8081
 spring:
   application:
     name: user-service
-#    security:
-#      jwt:
-#        secret-key: "ebPOOal7zbI/R9kr7ueSpDOPLwGAHvgJ3CSZgAby7la72GQJAB86YH1tHBJ31Ofs"
-#        expiration: 86400000
-#        refresh-token:
-#          expiration: 604800000
-  datasource:
-    url: jdbc:mysql://localhost:3309/plan_b_user
-    username: root
-    password: password#2#2
-    driver-class-name: com.mysql.cj.jdbc.Driver
-  jpa:
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.MySQL8Dialect
-    hibernate:
-      ddl-auto: update
-#kafka configuration
-  kafka:
-    producer:
-      bootstrap-servers: localhost:9092
-
-eureka:
-  client:
-    service-url:
-      defaultZone: http://localhost:8761/eureka
-
+  config:
+    import: optional:configserver:http://localhost:8888
 
