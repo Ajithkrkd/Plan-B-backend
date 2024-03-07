@@ -13,7 +13,9 @@ public class RouteValidator {
             "/user/api/auth/register",
             "/user/api/auth/login",
             "/user/api/auth/confirm-email",
-            "/eureka"
+            "/eureka",
+            "/user/api/auth/get_forgot_password_link",
+            "/user/api/auth/forgot_password"
     );
 
     public Predicate< ServerHttpRequest> isSecured =

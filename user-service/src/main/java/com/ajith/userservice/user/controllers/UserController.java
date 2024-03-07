@@ -1,6 +1,7 @@
 package com.ajith.userservice.user.controllers;
 
 import com.ajith.userservice.user.dto.ChangePasswordRequest;
+import com.ajith.userservice.user.dto.ForgotPasswordRequest;
 import com.ajith.userservice.user.dto.UserDetailsResponse;
 import com.ajith.userservice.user.dto.UserUpdateRequest;
 import com.ajith.userservice.user.service.IUserService;
@@ -42,16 +43,10 @@ public class UserController {
 
     @PostMapping("/change_password")
     public ResponseEntity<BasicResponse>changePassword(
-            @RequestHeader String authHeader,
+            @RequestHeader  ("Authorization") String authHeader,
             @RequestBody ChangePasswordRequest changePasswordRequest){
-        return iUserService.changePassword(authHeader
-                ,changePasswordRequest);
+        return iUserService.changePassword(authHeader,changePasswordRequest);
     }
 
-    //TODO: service not implemented
-    @PostMapping("/forgot_password")
-    public ResponseEntity<BasicResponse>forgot_password(
-            @RequestHeader String authHeader){
-        return iUserService.forgot_password(authHeader);
-    }
+
 }

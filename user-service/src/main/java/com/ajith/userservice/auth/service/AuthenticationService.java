@@ -101,7 +101,7 @@ public class AuthenticationService {
     public ResponseEntity< BasicResponse> confirmEmailWithToken (String token) {
 
         try {
-            Optional<User> userWithToken = userRepository.findByEmailVerificationToken ( token );
+            Optional<User> userWithToken = userRepository.findByVerificationToken ( token );
             if ( userWithToken.isPresent())
             {
                 User user = userWithToken.get ();

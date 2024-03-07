@@ -22,7 +22,10 @@ public class SecurityConfig{
     private static final String[] WHITE_LIST_URLS =
             {
                     "/user/api/auth/**",
-                    "/uploads/**"
+                    "/uploads/**",
+
+
+
 
             };
     @Bean

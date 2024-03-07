@@ -1,8 +1,13 @@
 package com.ajith.userservice.user.service;
 
+import com.ajith.userservice.GlobalExceptionHandler.Exceptions.ForgotPasswordTokenInvalidException;
 import com.ajith.userservice.GlobalExceptionHandler.Exceptions.UserNotFoundException;
 import com.ajith.userservice.config.JwtService;
+import com.ajith.userservice.kafka.event.ForgottenPasswordEvent;
+import com.ajith.userservice.kafka.service.EventService;
+import com.ajith.userservice.kafka.service.KafkaProducer;
 import com.ajith.userservice.user.dto.ChangePasswordRequest;
+import com.ajith.userservice.user.dto.ForgotPasswordRequest;
 import com.ajith.userservice.user.dto.UserDetailsResponse;
 import com.ajith.userservice.user.dto.UserUpdateRequest;
 import com.ajith.userservice.user.model.User;
@@ -14,11 +19,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Optional;
 
 @Service
@@ -29,6 +32,8 @@ public class userService implements IUserService{
     private final PasswordEncoder passwordEncoder;
     private  final FileUploadService fileUploadService;
     private final JwtService jwtService;
+    private final EventService eventService;
+    private final KafkaProducer kafkaProducer;
 
     @Override
     public boolean isEmailExist (String email) {
@@ -67,9 +72,9 @@ public class userService implements IUserService{
     }
 
     @Override
-    public ResponseEntity < BasicResponse > changePassword (String userEmail, ChangePasswordRequest changePasswordRequest) {
+    public ResponseEntity < BasicResponse > changePassword (String authHeader, ChangePasswordRequest changePasswordRequest) {
         try {
-            Optional < User > optionalUser = userRepository.findByEmail ( userEmail );
+            Optional < User > optionalUser = jwtService.findUserWithAuthHeader ( authHeader );
             if ( optionalUser.isPresent ( ) ) {
                 User validUser = optionalUser.get ( );
 
@@ -94,7 +99,7 @@ public class userService implements IUserService{
                 }
 
             }else {
-                throw new UserNotFoundException ( "User " + userEmail+ " does not exist" );
+                throw new UserNotFoundException ( "User does not exist" );
             }
         } catch (UserNotFoundException e) {
             throw new RuntimeException ( e.getMessage ( ) );
@@ -102,8 +107,27 @@ public class userService implements IUserService{
     }
 
     @Override
-    public ResponseEntity < BasicResponse > forgot_password (String userEmail) {
-        return null;
+    public ResponseEntity < BasicResponse > getForgotPasswordLink (String userEmail) {
+        try{
+            Optional<User> optionalUser = userRepository.findByEmail ( userEmail );
+            if( optionalUser.isPresent ( ) ){
+                User validUser = optionalUser.get();
+                ForgottenPasswordEvent event = eventService.createForgottenPasswordEvent ( validUser.getEmail ( ), validUser.getFullName ( ) );
+                kafkaProducer.publishForgottenPassword ( event );
+            return ResponseEntity.ok( BasicResponse.builder()
+                            .message ( "Forgotten password email sent successfully" )
+                            .description ( "check your email to view the forgot password link" )
+                            .timestamp ( LocalDateTime.now () )
+                            .status ( HttpStatus.OK.value ( ) )
+                    .build());
+            }else{
+                throw new UserNotFoundException ( "User doest not exist with your token " );
+            }
+        }catch (UserNotFoundException e){
+            throw new RuntimeException ( e.getMessage () );
+        }catch (Exception e){
+            throw new RuntimeException ( e.getMessage () );
+        }
     }
 
     @Override
@@ -135,6 +159,7 @@ public class userService implements IUserService{
                 .profile_image_path ( validUser.getProfileImage ( ) )
                 .phoneNumber ( validUser.getPhoneNumber ( ) )
                 .role ( validUser.getRole ( ) )
+                .joinDate ( validUser.getJoinDate ( ) )
                 .isEmailVerified ( validUser.isEmailVerified ( ) )
                 .build ( ) );
     }
@@ -155,6 +180,44 @@ public class userService implements IUserService{
         }catch (Exception e){
             throw new RuntimeException ( e.getMessage () );
         }
+    }
+
+    @Override
+    public ResponseEntity < BasicResponse > forgot_password (ForgotPasswordRequest forgotPasswordRequest) {
+        try{
+            Optional<User> optionalUser = userRepository.findByVerificationToken ( forgotPasswordRequest.getToken () );
+            if( optionalUser.isPresent ( ) ){
+                User validUser = optionalUser.get();
+                if(validUser.getVerificationToken ().equals ( forgotPasswordRequest.getToken () )){
+                return updatePasswordWithNewOne(forgotPasswordRequest,validUser);
+                }
+                else{
+                    throw new ForgotPasswordTokenInvalidException ("Your must provide valid token for forgotten password");
+                }
+
+            }else{
+                throw new UserNotFoundException ( "User  does not exist with this forgot password token"  );
+            }
+        }catch (UserNotFoundException e){
+            throw new RuntimeException ( e.getMessage () );
+        }
+        catch (ForgotPasswordTokenInvalidException e) {
+            throw new RuntimeException ( e );
+        }
+        catch (Exception e){
+            throw new RuntimeException ( e.getMessage () );
+        }
+    }
+
+    private ResponseEntity< BasicResponse> updatePasswordWithNewOne (ForgotPasswordRequest forgotPasswordRequest, User validUser) {
+        validUser.setPassword ( passwordEncoder.encode ( forgotPasswordRequest.getNewPassword () ) );
+        userRepository.save ( validUser );
+        return ResponseEntity.ok ( BasicResponse.builder()
+                .description ( "User " + validUser.getFullName() + " password updated")
+                .message ( "Password updated successfully" )
+                .timestamp ( LocalDateTime.now () )
+                .status ( HttpStatus.OK.value ( ) )
+                .build() )  ;
     }
 
     private ResponseEntity< BasicResponse> updateUserDetailsWithNewData (

@@ -27,7 +27,7 @@ public class User implements UserDetails {
     private String email;
     private String password;
     private boolean isEmailVerified = false;
-    private String emailVerificationToken;
+    private String verificationToken;
     private boolean isBlocked = false;
     private String profileImage;
     private Date joinDate;
