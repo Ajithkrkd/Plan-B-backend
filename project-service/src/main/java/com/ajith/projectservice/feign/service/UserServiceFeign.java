@@ -11,7 +11,9 @@ import java.util.Optional;
 @FeignClient("user-service")
 public interface UserServiceFeign {
 
-    @GetMapping("/user/api/auth/get_user_by_authHeader")
+    @GetMapping("/user/api/secure/get_user_by_authHeader")
     public ResponseEntity< User > getUserByAuthHeader(
             @RequestHeader("Authorization") String authHeader);
+
+
 }

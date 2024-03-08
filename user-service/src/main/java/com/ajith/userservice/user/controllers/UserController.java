@@ -46,7 +46,12 @@ public class UserController {
             @RequestBody ChangePasswordRequest changePasswordRequest){
         return iUserService.changePassword(authHeader,changePasswordRequest);
     }
+    @GetMapping("/get_user_by_authHeader")
+    public ResponseEntity < UserDetailsResponse > getUserByAuthHeader(
+            @RequestHeader("Authorization") String authHeader){
 
+        return iUserService.getUserByAuthHeader(authHeader);
+    }
 
 
 

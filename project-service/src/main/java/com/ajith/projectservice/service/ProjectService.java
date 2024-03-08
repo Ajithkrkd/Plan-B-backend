@@ -1,5 +1,6 @@
 package com.ajith.projectservice.service;
 
+import com.ajith.projectservice.dto.ProjectDetailsWithOutMembers;
 import com.ajith.projectservice.dto.ProjectRequest;
 import com.ajith.projectservice.entity.Project;
 import com.ajith.projectservice.exceptions.UserNotFoundException;
@@ -34,6 +35,7 @@ public class ProjectService implements IProjectService{
 
                 Project project =  Project.builder ()
                         .createdAt ( LocalDateTime.now () )
+                        .projectRootAdministrator ( validUser.getEmail () )
                         .projectAdministrators ( Collections.singletonList ( validUser.getUserId ( ) ) )
                         .title ( projectRequest.getTitle () )
                         .description ( projectRequest.getDescription() )
@@ -58,5 +60,10 @@ public class ProjectService implements IProjectService{
         catch (Exception e){
             throw new RuntimeException ( e.getMessage () );
         }
+    }
+
+    @Override
+    public ResponseEntity < ProjectDetailsWithOutMembers > getAllProjectDetails (String authHeader) {
+        return null;
     }
 }

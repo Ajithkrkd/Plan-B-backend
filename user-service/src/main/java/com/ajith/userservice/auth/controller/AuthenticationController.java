@@ -87,10 +87,5 @@ public class AuthenticationController {
         return userService.forgot_password (forgotPasswordRequest);
     }
 
-    @GetMapping("/get_user_by_authHeader")
-    public ResponseEntity < UserDetailsResponse > getUserByAuthHeader(
-            @RequestHeader("Authorization") String authHeader){
 
-        return userService.getUserByAuthHeader(authHeader);
-    }
 }
