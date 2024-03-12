@@ -1,5 +1,6 @@
 package com.ajith.projectservice.service;
 
+import com.ajith.jwtutilpackage.jwt.JwtService;
 import com.ajith.projectservice.dto.ProjectDetailsWithOutMembers;
 import com.ajith.projectservice.dto.ProjectRequest;
 import com.ajith.projectservice.entity.Project;
@@ -16,7 +17,9 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -32,7 +35,16 @@ public class ProjectService implements IProjectService{
             log.info ( user + " user got from user service" );
             if( user.isPresent ( ) ){
                 User validUser = user.get ();
-
+                //TODO: custom exception
+              boolean isProjectTitleDuplicating = projectRepository.existsByTitle(projectRequest.getTitle ());
+                if(isProjectTitleDuplicating){
+                      return ResponseEntity.status (HttpStatus.CONFLICT).body ( BasicResponse.builder()
+                            .message ( "Project Title is already exist" )
+                            .description ( "your project title  "+ projectRequest.getTitle ()+"  is already exist try another one   " )
+                            .timestamp ( LocalDateTime.now () )
+                            .status ( HttpStatus.CONFLICT.value ( ) )
+                            .build());
+                }
                 Project project =  Project.builder ()
                         .createdAt ( LocalDateTime.now () )
                         .projectRootAdministrator ( validUser.getEmail () )
@@ -63,7 +75,31 @@ public class ProjectService implements IProjectService{
     }
 
     @Override
-    public ResponseEntity < ProjectDetailsWithOutMembers > getAllProjectDetails (String authHeader) {
-        return null;
+    public ResponseEntity < List <ProjectDetailsWithOutMembers> > getAllProjectDetails (String authHeader) {
+        String token = JwtService.getTokenFromAuthHeader ( authHeader );
+        String userName = JwtService.getUsernameFromToken (token);
+        try{
+        List <Project> projectList = projectRepository.findByProjectRootAdministrator(userName);
+        if( projectList.isEmpty ( ) ) {
+            //TODO: custom error exception
+            return ResponseEntity.noContent().build();
+        }
+        List<ProjectDetailsWithOutMembers>projectDetails = projectList.stream ()
+                .map ( this::createProjectDetailsWithOutMembers )
+                .toList ( );
+        return ResponseEntity.ok ( projectDetails );
+    }catch ( Exception e ){
+        throw new RuntimeException ( e.getMessage() );
+
+    }
+    }
+
+    private ProjectDetailsWithOutMembers createProjectDetailsWithOutMembers (Project project) {
+       return ProjectDetailsWithOutMembers.builder ()
+                .projectId ( project.getId ( ) )
+                .project_profile_url ( project.getProject_profile_url () )
+                .title ( project.getTitle() )
+                .description ( project.getDescription() )
+                .build ();
     }
 }

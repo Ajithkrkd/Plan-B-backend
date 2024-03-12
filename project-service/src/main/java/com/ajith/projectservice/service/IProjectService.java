@@ -5,8 +5,10 @@ import com.ajith.projectservice.dto.ProjectRequest;
 import com.ajith.projectservice.utils.BasicResponse;
 import org.springframework.http.ResponseEntity;
 
+import java.util.List;
+
 public interface IProjectService {
     ResponseEntity< BasicResponse> createProject (ProjectRequest projectRequest, String authHeader);
 
-    ResponseEntity< ProjectDetailsWithOutMembers> getAllProjectDetails (String authHeader);
+    ResponseEntity< List<ProjectDetailsWithOutMembers> > getAllProjectDetails (String authHeader);
 }

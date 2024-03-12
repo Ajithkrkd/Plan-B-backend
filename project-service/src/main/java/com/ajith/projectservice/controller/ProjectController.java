@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/project")
 @RequiredArgsConstructor
@@ -22,7 +24,7 @@ public class ProjectController {
     }
 
     @GetMapping("/get_all_projects")
-    public ResponseEntity< ProjectDetailsWithOutMembers > getAllProjectDetails(
+    public ResponseEntity< List<ProjectDetailsWithOutMembers> > getAllProjectDetails(
             @RequestHeader ("Authorization") String authHeader){
         return iProjectService.getAllProjectDetails(authHeader);
     }

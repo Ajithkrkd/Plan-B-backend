@@ -13,6 +13,8 @@ import com.ajith.userservice.user.model.User;
 import com.ajith.userservice.user.repository.UserRepository;
 import com.ajith.userservice.user.token.TokenService;
 import com.ajith.userservice.utils.BasicResponse;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,15 +38,12 @@ public class AuthenticationService {
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
     private final TokenService tokenService;
+
+
+
+
     public ResponseEntity< BasicResponse> register (RegistrationRequest request) {
-        var user = User.builder ( )
-                .fullName ( request.getFullName () )
-                .phoneNumber ( request.getPhoneNumber () )
-                .email ( request.getEmail () )
-                .password (passwordEncoder.encode (request.getPassword ()))
-                .joinDate ( new Date ( ))
-                .role ( Role.USER )
-                .build ();
+        var user = registrationRequestToUser ( request );
         User savedWorker = userRepository.save ( user );
         return ResponseEntity.status( HttpStatus.CREATED)
                 .body(BasicResponse.builder()
@@ -53,6 +52,21 @@ public class AuthenticationService {
                         .timestamp ( LocalDateTime.now () )
                         .status ( HttpStatus.CREATED.value ( ) )
                         .build());
+    }
+
+    public User registrationRequestToUser (RegistrationRequest request) {
+        if( request == null ){
+            throw new NullPointerException ( "registration request is null" );
+        }
+        var user = User.builder ( )
+                .fullName ( request.getFullName () )
+                .phoneNumber ( request.getPhoneNumber () )
+                .email ( request.getEmail () )
+                .password (passwordEncoder.encode ( request.getPassword ()))
+                .joinDate ( new Date ( ))
+                .role ( Role.USER )
+                .build ();
+        return user;
     }
 
     public LoginResponse login (LoginRequest request) {

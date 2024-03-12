@@ -74,6 +74,8 @@ public class userService implements IUserService{
     @Override
     public ResponseEntity < BasicResponse > changePassword (String authHeader, ChangePasswordRequest changePasswordRequest) {
         try {
+            System.out.println (changePasswordRequest.toString () );
+
             Optional < User > optionalUser = jwtService.findUserWithAuthHeader ( authHeader );
             if ( optionalUser.isPresent ( ) ) {
                 User validUser = optionalUser.get ( );
