@@ -22,8 +22,7 @@ public class Project {
     private String project_profile_url;
     private LocalDateTime createdAt;
     private boolean is_deleted;
-    private String projectRootAdministrator;
-
+    private String projectRootAdministratorEmail;
     @ElementCollection
     private List<Long> projectAdministrators;
     @ElementCollection

@@ -20,4 +20,5 @@ public class ProjectDetailsResponse {
     private List < AssignedMembersDetails > assignedMembersDetailsList;
     private List < ProjectAdministratorDetails > projectAdministratorDetailsList;
     private LocalDateTime createdDateTime;
+    private String projectRootAdministratorEmail;
 }

@@ -1,9 +1,12 @@
 package com.ajith.projectservice.service;
 
 import com.ajith.jwtutilpackage.jwt.JwtService;
+import com.ajith.projectservice.dto.ProjectDetailsResponse;
 import com.ajith.projectservice.dto.ProjectDetailsWithOutMembers;
 import com.ajith.projectservice.dto.ProjectRequest;
 import com.ajith.projectservice.entity.Project;
+import com.ajith.projectservice.exceptions.ProjectNotFoundException;
+import com.ajith.projectservice.exceptions.ResourceAlreadyExist;
 import com.ajith.projectservice.exceptions.UserNotFoundException;
 import com.ajith.projectservice.feign.dto.User;
 import com.ajith.projectservice.feign.service.UserServiceFeign;
@@ -28,51 +31,44 @@ public class ProjectService implements IProjectService{
 
     private final UserServiceFeign userServiceFeign;
     private final ProjectRepository projectRepository;
+    private final MapperService mapperService;
     @Override
-    public ResponseEntity < BasicResponse > createProject (ProjectRequest projectRequest, String authHeader) {
+    public ResponseEntity < BasicResponse > createProject (ProjectRequest projectRequest, String authHeader)
+            throws ResourceAlreadyExist, UserNotFoundException {
         try{
             Optional< User > user = Optional.ofNullable ( userServiceFeign.getUserByAuthHeader ( authHeader ).getBody ( ) );
-            log.info ( user + " user got from user service" );
-            if( user.isPresent ( ) ){
-                User validUser = user.get ();
-                //TODO: custom exception
-              boolean isProjectTitleDuplicating = projectRepository.existsByTitle(projectRequest.getTitle ());
-                if(isProjectTitleDuplicating){
-                      return ResponseEntity.status (HttpStatus.CONFLICT).body ( BasicResponse.builder()
-                            .message ( "Project Title is already exist" )
-                            .description ( "your project title  "+ projectRequest.getTitle ()+"  is already exist try another one   " )
-                            .timestamp ( LocalDateTime.now () )
-                            .status ( HttpStatus.CONFLICT.value ( ) )
-                            .build());
-                }
-                Project project =  Project.builder ()
-                        .createdAt ( LocalDateTime.now () )
-                        .projectRootAdministrator ( validUser.getEmail () )
-                        .projectAdministrators ( Collections.singletonList ( validUser.getUserId ( ) ) )
-                        .title ( projectRequest.getTitle () )
-                        .description ( projectRequest.getDescription() )
-                        .is_deleted ( false )
-                        .assignedMembersIds ( Collections.singletonList ( validUser.getUserId () ) )
-                        .build ();
-                projectRepository.save ( project );
 
+            if(!user.isPresent ( ) ){
+                throw new UserNotFoundException ("user not found ");
+            }else{
+                User validUser = user.get ();
+              boolean isProjectTitleDuplicating = projectRepository.existsByTitle(projectRequest.getTitle ());
+
+              if (isProjectTitleDuplicating){
+                  throw new ResourceAlreadyExist ("project already exist with this title : " + projectRequest.getTitle ());
+              }
+                Project project = mapperService.mapProjectRequestToProject ( projectRequest, validUser );
+                projectRepository.save ( project );
                 return ResponseEntity.ok( BasicResponse.builder()
                         .message ( "Project created successfully" )
                         .description ( "your project is created and assigned to you "+ validUser.getFullName () )
                         .timestamp ( LocalDateTime.now () )
                         .status ( HttpStatus.CREATED.value ( ) )
                         .build());
-            }else{
-                throw new UserNotFoundException ("user not found ");
             }
         }
+        catch (ResourceAlreadyExist e){
+            throw e;
+        }
         catch (UserNotFoundException e) {
-            throw new RuntimeException ( e );
+            throw e;
         }
         catch (Exception e){
             throw new RuntimeException ( e.getMessage () );
         }
     }
+
+
 
     @Override
     public ResponseEntity < List <ProjectDetailsWithOutMembers> > getAllProjectDetails (String authHeader) {
@@ -85,7 +81,7 @@ public class ProjectService implements IProjectService{
             return ResponseEntity.noContent().build();
         }
         List<ProjectDetailsWithOutMembers>projectDetails = projectList.stream ()
-                .map ( this::createProjectDetailsWithOutMembers )
+                .map ( project -> mapperService.createProjectDetailsWithOutMembers(project) )
                 .toList ( );
         return ResponseEntity.ok ( projectDetails );
     }catch ( Exception e ){
@@ -94,12 +90,23 @@ public class ProjectService implements IProjectService{
     }
     }
 
-    private ProjectDetailsWithOutMembers createProjectDetailsWithOutMembers (Project project) {
-       return ProjectDetailsWithOutMembers.builder ()
-                .projectId ( project.getId ( ) )
-                .project_profile_url ( project.getProject_profile_url () )
-                .title ( project.getTitle() )
-                .description ( project.getDescription() )
-                .build ();
+    @Override
+    public ResponseEntity < ProjectDetailsResponse > getProjectByProjectId (String authHeader, Long projectId) {
+      try{
+          Optional<Project> expectedProject = projectRepository.findById ( projectId );
+          if( !expectedProject.isPresent()){
+              throw new ProjectNotFoundException ( "Project does not exist with id " + projectId);
+          }
+          Project existingProject = expectedProject.get ();
+          ProjectDetailsResponse projectDetailsResponse = mapperService.mapProjectToProjectDetailsResponse(existingProject ,authHeader);
+          return ResponseEntity.ok ( projectDetailsResponse);
+
+      }
+      catch (ProjectNotFoundException e){
+          throw e;
+      }
+      catch ( Exception e ){
+          throw new RuntimeException (e.getMessage ());
+      }
     }
 }

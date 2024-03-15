@@ -1,6 +1,7 @@
 package com.ajith.userservice.user.service;
 
 import com.ajith.userservice.GlobalExceptionHandler.Exceptions.ForgotPasswordTokenInvalidException;
+import com.ajith.userservice.GlobalExceptionHandler.Exceptions.UserBlockedException;
 import com.ajith.userservice.GlobalExceptionHandler.Exceptions.UserNotFoundException;
 import com.ajith.userservice.config.JwtService;
 import com.ajith.userservice.kafka.event.ForgottenPasswordEvent;
@@ -22,7 +23,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -227,6 +230,52 @@ public class userService implements IUserService{
         }catch (Exception e){
             throw new RuntimeException ( e.getMessage () );
         }
+    }
+
+    @Override
+    public ResponseEntity < List < UserDetailsResponse > > getUserByIds (String authHeader, List < Long > usersIds) {
+        try{
+            Optional<User> projectRootAdmin = jwtService.findUserWithAuthHeader ( authHeader );
+            if ( !projectRootAdmin.isPresent()){
+                throw new UserNotFoundException ( "project root Admin is not exist" );
+            }
+            if (projectRootAdmin.get ( ).isBlocked ( )){
+                throw new UserBlockedException ("project root Admin is blocked");
+            }
+            List<User>usersList = userRepository.findAllById (usersIds);
+            List<Long> missingUserIds = usersIds.stream()
+                    .filter(id -> usersList.stream().noneMatch(user -> user.getId() == (id)))
+                    .collect( Collectors.toList());
+
+            if (!missingUserIds.isEmpty()) {
+                String message = "Users with IDs " + missingUserIds + " not found.";
+                throw new UserNotFoundException(message); // Example exception
+            }
+            List<UserDetailsResponse> userDetailsList = usersList.stream ()
+                    .map (user -> convertUserToUserDetailsResponse(user))
+                    .collect (Collectors.toList());
+            return ResponseEntity.ok ( userDetailsList );
+        } catch (UserNotFoundException e) {
+            throw e;
+        } catch (UserBlockedException e) {
+            throw  e ;
+        }catch (Exception e){
+            throw new RuntimeException ( e.getMessage () );
+        }
+    }
+
+    private UserDetailsResponse convertUserToUserDetailsResponse (User user) {
+      return   UserDetailsResponse.builder ()
+        .userId ( user.getId ( ) )
+                .fullName ( user.getFullName ( ) )
+                .email ( user.getEmail ( ) )
+                .isBlocked ( user.isBlocked ( ) )
+                .profile_image_path ( user.getProfileImage ( ) )
+                .phoneNumber ( user.getPhoneNumber ( ) )
+                .role ( user.getRole ( ) )
+                .joinDate ( user.getJoinDate ( ) )
+                .isEmailVerified ( user.isEmailVerified ( ) )
+                .build ( ) ;
     }
 
     private ResponseEntity< BasicResponse> updatePasswordWithNewOne (ForgotPasswordRequest forgotPasswordRequest, User validUser) {

@@ -8,7 +8,8 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class ProjectAdministratorDetails {
-    private Long administrator_id;
+    private Long id;
     private String fullName;
     private String email;
+    private String profile_image_url;
 }
