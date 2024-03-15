@@ -32,3 +32,9 @@ spring:
             - Path=/user/**
           filters:
             - AuthenticationFilter
+        - id: project-service
+          uri: lb://project-service
+          predicates:
+            - Path=/project/**
+          filters:
+            - AuthenticationFilter

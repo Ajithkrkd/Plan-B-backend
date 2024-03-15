@@ -8,6 +8,7 @@ import com.ajith.userservice.kafka.event.UserEmailTokenEvent;
 import com.ajith.userservice.kafka.service.KafkaProducer;
 import com.ajith.userservice.kafka.service.EventService;
 import com.ajith.userservice.user.dto.ForgotPasswordRequest;
+import com.ajith.userservice.user.dto.UserDetailsResponse;
 import com.ajith.userservice.user.service.IUserService;
 import com.ajith.userservice.utils.BasicResponse;
 import lombok.RequiredArgsConstructor;
@@ -85,4 +86,6 @@ public class AuthenticationController {
 
         return userService.forgot_password (forgotPasswordRequest);
     }
+
+
 }

@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 
 public interface IUserService {
@@ -26,4 +27,8 @@ public interface IUserService {
     ResponseEntity< BasicResponse> updateUserDetails (UserUpdateRequest userUpdateRequest, String authHeader);
 
     ResponseEntity< BasicResponse> forgot_password (ForgotPasswordRequest forgotPasswordRequest);
+
+    ResponseEntity < UserDetailsResponse > getUserByAuthHeader (String authHeader);
+
+    ResponseEntity< List< UserDetailsResponse>> getUserByIds (String authHeader, List< Long> usersIds);
 }
