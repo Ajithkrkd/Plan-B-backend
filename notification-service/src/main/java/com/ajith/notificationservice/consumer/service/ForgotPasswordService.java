@@ -23,12 +23,10 @@ public class ForgotPasswordService {
         helper.setTo ( event.getEmail () );
         String subject = "Here's the link to Change your password";
         String content = "<html><body style='font-family: Arial, sans-serif;'>"
-                + "<h2 style='color: #007bff;'>Verify Your Email</h2>"
+                + "<h2 style='color: #007bff;'>Change your password</h2>"
                 + "<span>Hello,</span>"+"  " +event.getFullName ()
                 + "<p>You have requested to change your password.</p>"
-                + "<p><a href='" + confirmationLink+ "' style='background-color: #007bff; color: #ffffff; padding: 10px 20px; text-decoration: none; border-radius: 5px;'>Click here to verify your email</a></p>"
-                + "<p>If the above link doesn't work, you can copy and paste this URL into your browser:</p>"
-                + "<p><a href='" + confirmationLink +"</a></p>"
+                + "<p><a href='" + confirmationLink+ "' style='background-color: #007bff; color: #ffffff; padding: 10px 20px; text-decoration: none; border-radius: 5px;'>Click here to change your password</a></p>"
                 + "<p style='color: #888;'>Ignore this email if you remember your password or if you haven't made this request.</p>"
                 + "</body></html>";
 

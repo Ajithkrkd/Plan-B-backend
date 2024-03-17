@@ -75,7 +75,7 @@ public class ProjectService implements IProjectService{
         String token = JwtService.getTokenFromAuthHeader ( authHeader );
         String userName = JwtService.getUsernameFromToken (token);
         try{
-        List <Project> projectList = projectRepository.findByProjectRootAdministrator(userName);
+        List <Project> projectList = projectRepository.findByProjectRootAdministratorEmail(userName);
         if( projectList.isEmpty ( ) ) {
             //TODO: custom error exception
             return ResponseEntity.noContent().build();

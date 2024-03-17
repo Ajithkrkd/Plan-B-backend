@@ -1,7 +1,7 @@
 package com.ajith.notificationservice.config;
 
+import com.ajith.notificationservice.event.InviteMemberEvent;
 import com.ajith.notificationservice.event.UserEmailTokenEvent;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,17 +30,35 @@ public class KafkaConsumerConfig {
         return props;
     }
     @Bean
-    public ConsumerFactory <String, UserEmailTokenEvent > consumerFactory() {
+    public ConsumerFactory <String, UserEmailTokenEvent > UserEmailAndPasswordconsumerFactory() {
         return new DefaultKafkaConsumerFactory <> (
                 consumerConfigs(),
                 new StringDeserializer(),
                 new ErrorHandlingDeserializer<>(new JsonDeserializer <> (UserEmailTokenEvent.class, false)));
     }
     @Bean
-    public ConcurrentKafkaListenerContainerFactory <String, UserEmailTokenEvent> kafkaListenerContainerFactory() {
+    public ConcurrentKafkaListenerContainerFactory <String, UserEmailTokenEvent> userEmailAndPasswordKafkaListenerContainerFactory() {
         ConcurrentKafkaListenerContainerFactory<String, UserEmailTokenEvent> factory =
                 new ConcurrentKafkaListenerContainerFactory<>();
-        factory.setConsumerFactory(consumerFactory());
+        factory.setConsumerFactory(UserEmailAndPasswordconsumerFactory());
         return factory;
     }
+    @Bean
+    public ConsumerFactory<String, InviteMemberEvent> InviteMemberconsumerFactory() {
+        return new DefaultKafkaConsumerFactory<>(
+                consumerConfigs(),
+                new StringDeserializer(),
+                new ErrorHandlingDeserializer<>(new JsonDeserializer<>(InviteMemberEvent.class, false))); // Use InviteMemberEvent deserializer here
+    }
+
+    @Bean
+    public ConcurrentKafkaListenerContainerFactory<String, InviteMemberEvent> inviteMemberKafkaListenerContainerFactory() {
+        ConcurrentKafkaListenerContainerFactory<String, InviteMemberEvent> factory =
+                new ConcurrentKafkaListenerContainerFactory<>();
+        factory.setConsumerFactory(InviteMemberconsumerFactory ());
+        return factory;
+    }
+
+
+
 }
