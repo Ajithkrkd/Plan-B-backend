@@ -5,7 +5,6 @@ import com.ajith.projectservice.members.enums.InvitationStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDateTime;
 import java.util.Date;
 
 @Entity
@@ -25,10 +24,10 @@ public class MemberInvitation {
     @JoinColumn(name = "project_id")
     private Project project;
 
-    private String memberEmail;
+    private String inviteSentTo;
     private String invitationMessage;
     private String invitationToken;
-
+    private String inviteFrom;
     @Enumerated(EnumType.STRING)
     private InvitationStatus status;
 

@@ -4,6 +4,8 @@ import com.ajith.jwtutilpackage.jwt.JwtService;
 import com.ajith.projectservice.entity.Project;
 import com.ajith.projectservice.exceptions.ResourceNotFoundException;
 import com.ajith.projectservice.members.dto.InviteRequest;
+import com.ajith.projectservice.members.dto.MemberInvitationResponse;
+import com.ajith.projectservice.members.entity.MemberInvitation;
 import com.ajith.projectservice.members.service.IMemberInvitationService;
 import com.ajith.projectservice.repository.ProjectRepository;
 import com.ajith.projectservice.service.IProjectService;
@@ -15,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -49,12 +52,24 @@ public class MembersInvitationController {
             }
             //TODO: only admins can invite members
                 Project existingProject = optionalProject.get ();
-                iMemberInvitationService.sentInviteToMember(inviteRequest,authHeader,existingProject);
+              return  iMemberInvitationService.sentInviteToMember(inviteRequest,authHeader,existingProject);
 
         }catch (ResourceNotFoundException e){
             throw e;
         }
 
-        return null;
+    }
+
+    @PostMapping("/accept")
+    public ResponseEntity<BasicResponse> acceptInvitationRequest(
+            @RequestParam  String token,
+            @RequestHeader("Authorization") String authHeader
+    ){
+       return iMemberInvitationService.acceptTheInviteRequest(token,authHeader);
+    }
+
+    @GetMapping("/invitations")
+    public ResponseEntity< List < MemberInvitationResponse > > getAllInvitations(@RequestHeader ("Authorization") String authHeader){
+        return iMemberInvitationService.getAllInvitations(authHeader);
     }
 }
