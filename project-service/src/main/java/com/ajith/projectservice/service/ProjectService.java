@@ -112,6 +112,8 @@ public class ProjectService implements IProjectService{
 
     @Override
     public boolean isProjectExist (Long projectId ) {
-        return projectRepository.existsById(projectId);
+        boolean isExist = projectRepository.existsById(projectId);
+        System.out.println (isExist +"-----------------------------------" );
+        return isExist;
     }
 }

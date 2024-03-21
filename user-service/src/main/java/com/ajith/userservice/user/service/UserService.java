@@ -266,6 +266,21 @@ public class UserService implements IUserService{
         }
     }
 
+    @Override
+    public ResponseEntity < UserDetailsResponse > getUserById (String memberId) {
+        try {
+            Optional<User> optionalUser = userRepository.findById ( Long.valueOf ( memberId ) );
+            if (! optionalUser.isPresent()){
+                throw new UserNotFoundException ( "user with id does not exist " + memberId );
+            }
+            User expectedUser = optionalUser.get();
+            UserDetailsResponse response= convertUserToUserDetailsResponse ( expectedUser );
+             return ResponseEntity.ok ( response );
+        }catch ( UserNotFoundException e){
+            throw new RuntimeException ( e.getMessage () );
+        }
+    }
+
     private UserDetailsResponse convertUserToUserDetailsResponse (User user) {
       return   UserDetailsResponse.builder ()
         .userId ( user.getId ( ) )

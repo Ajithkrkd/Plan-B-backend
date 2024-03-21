@@ -8,4 +8,8 @@ import java.util.Optional;
 
 public interface IWorkItemService {
     ResponseEntity< BasicResponse> createWorkItem (String workItemCategory, String title, Optional< String> parentWorkItemId, String projectId, String authHeader);
+
+    ResponseEntity< BasicResponse> assignMemberToWorkItem (String workItemId, Long userId);
+
+    ResponseEntity< BasicResponse> changeWorkItemState (String workItemId, String newState);
 }

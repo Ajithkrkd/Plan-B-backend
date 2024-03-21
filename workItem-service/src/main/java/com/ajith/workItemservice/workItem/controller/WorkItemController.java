@@ -9,13 +9,13 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/work-item")
+@RequestMapping("/workItem")
 @RequiredArgsConstructor
 public class WorkItemController {
 
     private final IWorkItemService iWorkItemService;
 
-
+    //Todo if the work item epic only add child as issue can't add child task to epic
     @PostMapping("/create")
     public ResponseEntity< BasicResponse > createWorkItem(
             @RequestParam String title,
@@ -25,6 +25,12 @@ public class WorkItemController {
             @RequestHeader ("Authorization") String authHeader){
 
         return iWorkItemService.createWorkItem(workItemCategory,title, parentWorkItemId,projectId,authHeader);
+    }
+
+    @PostMapping("/changeState")
+    public ResponseEntity<BasicResponse> changeWorkItemState(@RequestParam ("newState") String newState,
+    @RequestParam("workItemId") String workItemId){
+        return iWorkItemService.changeWorkItemState(workItemId,newState);
     }
 
 }

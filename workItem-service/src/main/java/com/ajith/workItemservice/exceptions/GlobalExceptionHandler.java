@@ -22,4 +22,25 @@ public class GlobalExceptionHandler {
         message.setTimestamp ( LocalDateTime.now ( ) );
         return message;
     }
+    @ExceptionHandler (value = {UserNotFoundException.class})
+    @ResponseStatus (value = HttpStatus.BAD_REQUEST)
+    public BasicResponse UserNotFountException(UserNotFoundException ex , WebRequest request) {
+        BasicResponse message = new BasicResponse();
+        message.setStatus (HttpStatus.BAD_REQUEST.value ());
+        message.setMessage ( ex.getMessage() );
+        message.setDescription ( " unable to find the user check end point request others" );
+        message.setTimestamp ( LocalDateTime.now ( ) );
+        return message;
+    }
+    @ExceptionHandler (value = {ResourceDuplicationException.class})
+    @ResponseStatus (value = HttpStatus.BAD_REQUEST)
+    public BasicResponse ResourceDuplicationException(ResourceDuplicationException ex , WebRequest request) {
+        BasicResponse message = new BasicResponse();
+        message.setStatus (HttpStatus.BAD_REQUEST.value ());
+        message.setMessage ( ex.getMessage() );
+        message.setDescription ( "Your trying to create a resource is already exist try another" );
+        message.setTimestamp ( LocalDateTime.now ( ) );
+        return message;
+    }
+
 }

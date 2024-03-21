@@ -42,7 +42,7 @@ public class ProjectController {
     }
 
 
-    @GetMapping("/{projectId}")
+    @GetMapping("/checkProjectIsExist")
     public boolean isProjectExist(@RequestParam Long projectId){
         return iProjectService.isProjectExist(projectId);
     }

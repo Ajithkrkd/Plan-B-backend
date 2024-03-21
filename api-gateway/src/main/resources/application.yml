@@ -38,3 +38,9 @@ spring:
             - Path=/project/**
           filters:
             - AuthenticationFilter
+        - id: workItem-service
+          uri: lb://workItem-service
+          predicates:
+            - Path=/workItem/**
+          filters:
+            - AuthenticationFilter
