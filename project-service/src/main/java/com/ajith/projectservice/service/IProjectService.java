@@ -18,4 +18,5 @@ public interface IProjectService {
 
     ResponseEntity < ProjectDetailsResponse > getProjectByProjectId (String authHeader, Long projectId);
 
+    boolean isProjectExist (Long projectId);
 }

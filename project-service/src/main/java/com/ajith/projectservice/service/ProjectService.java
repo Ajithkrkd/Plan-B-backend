@@ -109,4 +109,9 @@ public class ProjectService implements IProjectService{
           throw new RuntimeException (e.getMessage ());
       }
     }
+
+    @Override
+    public boolean isProjectExist (Long projectId ) {
+        return projectRepository.existsById(projectId);
+    }
 }

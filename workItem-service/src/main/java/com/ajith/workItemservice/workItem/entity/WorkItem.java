@@ -1,12 +1,10 @@
 package com.ajith.workItemservice.workItem.entity;
 
 import com.ajith.workItemservice.comments.entity.Comment;
+import com.ajith.workItemservice.workItem.enums.WorkItemCategory;
 import com.ajith.workItemservice.workingLifeCycle.entity.WorkingLifeCycle;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.List;
 
@@ -15,12 +13,14 @@ import java.util.List;
 @AllArgsConstructor
 @Getter
 @Setter
+@Builder
 public class WorkItem {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long workItemId;
     private String title;
     private String description;
+    private WorkItemCategory category;
     private Long projectId;
     private Long parentWorkItemId;
     private List< Comment >comments;
