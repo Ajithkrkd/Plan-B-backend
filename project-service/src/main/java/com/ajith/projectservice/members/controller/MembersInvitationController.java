@@ -1,18 +1,14 @@
 package com.ajith.projectservice.members.controller;
 
-import com.ajith.jwtutilpackage.jwt.JwtService;
 import com.ajith.projectservice.entity.Project;
 import com.ajith.projectservice.exceptions.ResourceNotFoundException;
 import com.ajith.projectservice.members.dto.InviteRequest;
 import com.ajith.projectservice.members.dto.MemberInvitationResponse;
-import com.ajith.projectservice.members.entity.MemberInvitation;
 import com.ajith.projectservice.members.service.IMemberInvitationService;
 import com.ajith.projectservice.repository.ProjectRepository;
-import com.ajith.projectservice.service.IProjectService;
 import com.ajith.projectservice.utils.BasicResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@ToString
 @Entity
 public class Comment {
     @Id
@@ -22,8 +23,8 @@ public class Comment {
     private String content;
     private LocalDateTime commentedOn;
     private Long commentedBy;
-    private Long workItemId;
-    private boolean isDeleted;
+    private boolean isEdited = false;
+    private boolean isDeleted = false;
 
 
 }

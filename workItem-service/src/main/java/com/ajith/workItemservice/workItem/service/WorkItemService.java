@@ -28,14 +28,16 @@ public class WorkItemService implements IWorkItemService{
             String workItemCategory,
             String title,
             Optional < String > parentWorkItemId,
-            String projectId, String authHeader) {
+            String projectId,
+            String authHeader) {
 
         try {
 
             boolean isExist = projectFeignService.isProjectExist (Long.valueOf(projectId));
-            if(!isExist){
-                throw new ResourceNotFountException ( "the project with this " + projectId +" is not exist" );
-            }
+
+                if(!isExist){
+                    throw new ResourceNotFountException ( "the project with this " + projectId +" is not exist" );
+                }
 
             createWorkItemAndSave ( workItemCategory, title, parentWorkItemId, projectId );
             return ResponseEntity.ok ( BasicResponse.builder ()
@@ -97,7 +99,7 @@ public class WorkItemService implements IWorkItemService{
             existingWorkItem.setState ( state );
             workItemRepository.save ( existingWorkItem );
            return ResponseEntity.ok ( BasicResponse.builder ( )
-                    .description ( "state has changed form " + newState + " to " + state )
+                    .description ( "state has changed " + " to  " + state )
                     .message ( "work item state changed successfully" )
                     .status ( HttpStatus.OK.value ( ) )
                     .timestamp ( LocalDateTime.now ( ) )
@@ -111,17 +113,8 @@ public class WorkItemService implements IWorkItemService{
     }
 
     private void createWorkItemAndSave (String workItemCategory, String title, Optional < String > parentWorkItemId, String projectId) {
-        WorkItemCategory category = null;
-        if(workItemCategory.equals ( "EPIC" )){
-            category = WorkItemCategory.EPIC;
-        }
-        if ( workItemCategory.equals ( "ISSUE" ) ){
-            category = WorkItemCategory.ISSUE;
-        }
-        if(workItemCategory.equals ( "TASK" )){
-            category = WorkItemCategory.TASK;
-        }
-        
+        WorkItemCategory category = getWorkItemCategory ( workItemCategory );
+
         WorkItem newWorkItem = WorkItem.builder ()
                 .parentWorkItemId ( parentWorkItemId.isPresent () ? Long.valueOf ( parentWorkItemId.get () ) : null )
                 .title ( title)
@@ -131,5 +124,19 @@ public class WorkItemService implements IWorkItemService{
                 .projectId ( Long.valueOf ( projectId ) )
                 .build ();
         workItemRepository.save ( newWorkItem );
+    }
+
+    private static WorkItemCategory getWorkItemCategory (String workItemCategory) {
+        WorkItemCategory category = null;
+        if( workItemCategory.equals ( "EPIC" )){
+            category = WorkItemCategory.EPIC;
+        }
+        if ( workItemCategory.equals ( "ISSUE" ) ){
+            category = WorkItemCategory.ISSUE;
+        }
+        if( workItemCategory.equals ( "TASK" )){
+            category = WorkItemCategory.TASK;
+        }
+        return category;
     }
 }

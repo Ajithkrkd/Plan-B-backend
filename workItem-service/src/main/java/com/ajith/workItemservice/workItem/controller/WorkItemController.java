@@ -28,8 +28,9 @@ public class WorkItemController {
     }
 
     @PostMapping("/changeState")
-    public ResponseEntity<BasicResponse> changeWorkItemState(@RequestParam ("newState") String newState,
-    @RequestParam("workItemId") String workItemId){
+    public ResponseEntity<BasicResponse> changeWorkItemState(
+            @RequestParam ("newState") String newState,
+            @RequestParam("workItemId") String workItemId){
         return iWorkItemService.changeWorkItemState(workItemId,newState);
     }
 

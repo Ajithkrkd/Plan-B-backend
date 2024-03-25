@@ -45,7 +45,7 @@ public class LabelController {
             return ilabelService.deleteLabel(labelId,workItemId);
     }
 
-    @GetMapping("/all/workItemId")
+    @GetMapping("/all/{workItemId}")
     public ResponseEntity< List <String> >getAllLabelsByWorkItemId(
             @PathVariable ("workItemId") String workItemId){
         return ilabelService.getAllLabelsByWorkItemId(workItemId);

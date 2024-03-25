@@ -5,9 +5,11 @@ import com.ajith.workItemservice.label.entity.Label;
 import com.ajith.workItemservice.workItem.enums.WorkItemCategory;
 import com.ajith.workItemservice.workItem.enums.WorkItemState;
 import com.ajith.workItemservice.workingLifeCycle.entity.WorkingLifeCycle;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -31,12 +33,23 @@ public class WorkItem {
     private Date createdAt;
     private boolean isDeleted =false;
     private boolean isArchived = false;
-    @OneToMany (cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinColumn(name = "work_item_id")
+
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "work_item_comment",
+            joinColumns = @JoinColumn(name = "work_item_id"),
+            inverseJoinColumns = @JoinColumn(name = "comment_id")
+    )
+
     private List<Comment> comments;
-    @OneToMany (cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinColumn(name = "work_item_id")
-    private List< Label > labels;
+
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "work_item_label",
+            joinColumns = @JoinColumn(name = "work_item_id"),
+            inverseJoinColumns = @JoinColumn(name = "label_id")
+    )
+    private List<Label> labels;
 
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "working_life_cycle_id")

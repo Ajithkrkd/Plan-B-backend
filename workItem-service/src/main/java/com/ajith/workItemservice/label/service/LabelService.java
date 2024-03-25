@@ -37,14 +37,23 @@ public class LabelService implements ILabelService {
             if(!optionalWorkItem.isPresent ()){
                 throw new ResourceNotFountException ( "Work item does not exist with this work item id "+ workItemId );
             }
-            //TODO: add colors for the labels
+
             WorkItem existingWorkItem = optionalWorkItem.get();
-            if( existingWorkItem.getLabels ().stream ().map ( label -> label.getLabelName () == labelTitle ).findFirst ().isPresent ()){
-                log.info ( "Work item with label "+ labelTitle+" already exists" );
-                throw new ResourceDuplicationException ( "Work item with label "+ labelTitle+" already exists");
+            if (existingWorkItem.getLabels().stream()
+                    .anyMatch(label -> label.getLabelName().equals(labelTitle))) {
+                log.info("Work item with label " + labelTitle + " already exists");
+                throw new ResourceDuplicationException("Work item with label " + labelTitle + " already exists");
             }
-            Label newLabel = createAndSaveLabel ( labelTitle, expectedUser, existingWorkItem );
-            existingWorkItem.getLabels ().add ( newLabel );
+
+            Optional<Label> duplicatedLabel = labelRepository.findByLabelName(labelTitle);
+            Label newLabel;
+            if(!duplicatedLabel.isPresent()) {
+                newLabel = createAndSaveLabel ( labelTitle, expectedUser, existingWorkItem );
+                existingWorkItem.getLabels ().add ( newLabel );
+            }else {
+                newLabel = duplicatedLabel.get ();
+                existingWorkItem.getLabels ().add ( newLabel );
+            }
             workItemRepository.save ( existingWorkItem );
             return ResponseEntity.ok ( BasicResponse.builder ( )
                     .description ( "Work item with label " + labelTitle + " created successfully" )
@@ -81,13 +90,14 @@ public class LabelService implements ILabelService {
             if (!labelToRemove.isPresent()) {
                 throw new ResourceNotFountException ("Label with id " + labelId + " is not associated with work item " + workItemId);
             }
+
             labelList.remove(labelToRemove.get());
             workItemRepository.save(existingWorkItem);
 
             return ResponseEntity.ok().body(new BasicResponse(
                     HttpStatus.OK.value (),
                     "label deleted successfully" ,
-                    "Label with id " + labelId + " is not associated with work item " + workItemId,
+                    "Label with id " + labelId + "  is now not  associated with work item " + workItemId,
                     LocalDateTime.now ()));
 
         } catch (NumberFormatException e) {
@@ -109,7 +119,8 @@ public class LabelService implements ILabelService {
         }
         WorkItem existingWorkItem = optionalWorkItem.get();
 
-        List<Label> labelList = labelRepository.findAllByWorkItemId(workId);
+        List<Label> labelList = existingWorkItem.getLabels ();
+
         if (labelList.isEmpty ()){
             return ResponseEntity.ok ( Collections.emptyList () );
         }
@@ -124,7 +135,6 @@ public class LabelService implements ILabelService {
         Label newLabel = Label.builder ( )
                 .createdBy ( expectedUser.getUserId ( ) )
                 .labelName ( labelTitle )
-                .workItemId ( existingWorkItem.getWorkItemId ( ) )
                 .build ( );
         return labelRepository.save ( newLabel );
     }

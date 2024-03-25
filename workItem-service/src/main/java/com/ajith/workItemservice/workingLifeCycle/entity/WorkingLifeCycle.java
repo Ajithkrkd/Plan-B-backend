@@ -6,7 +6,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.*;
 
-import java.time.LocalDateTime;
+import java.util.Date;
 
 @Entity
 @NoArgsConstructor
@@ -14,11 +14,14 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @ToString
+@Builder
 public class WorkingLifeCycle {
     @Id
     @GeneratedValue (strategy = GenerationType.AUTO)
     private Long workingLifeCycleId;
     private String title;
-    private LocalDateTime startTime;
-    private LocalDateTime endTime;
+    private Date startTime;
+    private Date endTime;
+    private boolean isDeleted=false;
+    private Long createdBy;
 }

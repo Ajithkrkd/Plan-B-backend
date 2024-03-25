@@ -1,9 +1,7 @@
 package com.ajith.workItemservice.label.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import com.ajith.workItemservice.workItem.entity.WorkItem;
+import jakarta.persistence.*;
 import lombok.*;
 
 @Getter
@@ -17,6 +15,5 @@ public class Label {
     @GeneratedValue (strategy = GenerationType.AUTO)
     private Long labelId;
     private String labelName;
-    private Long workItemId;
     private Long createdBy;
 }
