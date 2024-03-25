@@ -63,7 +63,13 @@ public class UserController {
     ){
         return iUserService.getUserByIds(authHeader,usersIds);
     }
-
+    @GetMapping("/getUserById")
+    ResponseEntity<UserDetailsResponse> getMemberById(
+            @RequestHeader("Authorization") String authHeader,
+            @RequestParam ("memberId") String memberId
+    ){
+        return iUserService.getUserById(memberId);
+    }
 
 
 }

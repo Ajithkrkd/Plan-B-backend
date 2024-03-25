@@ -27,8 +27,6 @@ public class UserEmailVerificationService {
                 + "<span>Hello,</span>"+"  " +event.getFullName ()
                 + "<p>You have requested to verify your email.</p>"
                 + "<p><a href='" + confirmationLink+ "' style='background-color: #007bff; color: #ffffff; padding: 10px 20px; text-decoration: none; border-radius: 5px;'>Click here to verify your email</a></p>"
-                + "<p>If the above link doesn't work, you can copy and paste this URL into your browser:</p>"
-                + "<p><a href='" + confirmationLink +"</a></p>"
                 + "<p style='color: #888;'>Ignore this email if you remember your password or if you haven't made this request.</p>"
                 + "</body></html>";
 

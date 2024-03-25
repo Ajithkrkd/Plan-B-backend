@@ -31,4 +31,6 @@ public interface IUserService {
     ResponseEntity < UserDetailsResponse > getUserByAuthHeader (String authHeader);
 
     ResponseEntity< List< UserDetailsResponse>> getUserByIds (String authHeader, List< Long> usersIds);
+
+    ResponseEntity< UserDetailsResponse> getUserById (String memberId);
 }

@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class userService implements IUserService{
+public class UserService implements IUserService{
 
     private  final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -80,12 +80,14 @@ public class userService implements IUserService{
             System.out.println (changePasswordRequest.toString () );
 
             Optional < User > optionalUser = jwtService.findUserWithAuthHeader ( authHeader );
+
             if ( optionalUser.isPresent ( ) ) {
                 User validUser = optionalUser.get ( );
 
                 if ( passwordEncoder.matches ( changePasswordRequest.getCurrentPassword () , validUser.getPassword ( ) ) ) {
                     validUser.setPassword ( passwordEncoder.encode ( changePasswordRequest.getNewPassword ( ) ) );
                     userRepository.save ( validUser );
+
                     return ResponseEntity.status ( HttpStatus.OK ).body ( BasicResponse
                             .builder ( )
                             .message ( "Your password is changed" )
@@ -260,6 +262,21 @@ public class userService implements IUserService{
         } catch (UserBlockedException e) {
             throw  e ;
         }catch (Exception e){
+            throw new RuntimeException ( e.getMessage () );
+        }
+    }
+
+    @Override
+    public ResponseEntity < UserDetailsResponse > getUserById (String memberId) {
+        try {
+            Optional<User> optionalUser = userRepository.findById ( Long.valueOf ( memberId ) );
+            if (! optionalUser.isPresent()){
+                throw new UserNotFoundException ( "user with id does not exist " + memberId );
+            }
+            User expectedUser = optionalUser.get();
+            UserDetailsResponse response= convertUserToUserDetailsResponse ( expectedUser );
+             return ResponseEntity.ok ( response );
+        }catch ( UserNotFoundException e){
             throw new RuntimeException ( e.getMessage () );
         }
     }

@@ -5,6 +5,7 @@ import com.ajith.apigateway.exceptions.AuthHeaderNotFountException;
 import com.ajith.apigateway.exceptions.TokenInvalidException;
 import com.ajith.apigateway.utils.JwtUtils;
 import com.ajith.apigateway.utils.RouteValidator;
+import io.jsonwebtoken.ExpiredJwtException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
@@ -35,7 +36,7 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
                     {
                             throw new AuthHeaderNotFountException ( "missing authorization header" );
                     }
-                    } catch (RuntimeException e) {
+                    } catch (AuthHeaderNotFountException e) {
                     log.error ( "Exception" + e.getMessage () );
                         throw new AuthHeaderNotFountException ( "auth header is not fount please provide token" );
                     }
@@ -47,11 +48,13 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
 
                 try
                 {
+                    //Todo do it properly exception not handling
                     log.info ( "checking token expired or not " + authHeader );
-                    if(jwtUtils.isTokenExpired ( authHeader ))
-                    {
-                        log.info ( "token successfully accepected " + authHeader);
-                    }
+                    jwtUtils.isTokenExpired ( authHeader );
+
+                }
+                catch ( ExpiredJwtException e ){
+                    throw new TokenInvalidException ("Token Expired");
                 }
                 catch (Exception e)
                 {

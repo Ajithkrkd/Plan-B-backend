@@ -1,11 +1,9 @@
 server:
   port: 8084
 spring:
-  application:
-    name: workItem-service
   datasource:
     url: jdbc:mysql://localhost:3309/plan_b_workItem
-    username: user
+    username: root
     password: password#2#2
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
@@ -13,8 +11,9 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
     hibernate:
-      ddl-auto: create-drop
-
+      ddl-auto: update
+  application:
+    name: workItem-service
 eureka:
   client:
     service-url:

@@ -9,13 +9,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/user/api/auth/refreshToken")
 @RequiredArgsConstructor
 public class TokenRefreshController {
 
     private final RefreshTokenService refreshTokenService;
 
-    @PostMapping
+    @PostMapping("/user/api/auth/refreshToken")
     public LoginResponse refreshToken(HttpServletRequest request, HttpServletResponse response){
         return refreshTokenService.refreshToken(request, response);
     }

@@ -41,4 +41,9 @@ public class ProjectController {
         return iProjectService.getProjectByProjectId(authHeader,project_ID);
     }
 
+
+    @GetMapping("/checkProjectIsExist")
+    public boolean isProjectExist(@RequestParam Long projectId){
+        return iProjectService.isProjectExist(projectId);
+    }
 }
