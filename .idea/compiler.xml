@@ -25,7 +25,7 @@
       <module name="project-service" options="-parameters" />
       <module name="service-registry" options="-parameters" />
       <module name="user-service" options="-parameters" />
-      <module name="workItem-service" options="-parameters" />
+      <module name="workItem-service" options="" />
     </option>
   </component>
 </project>

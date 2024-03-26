@@ -42,7 +42,8 @@ public class MemberInvitationService implements IMemberInvitationService{
 
             InviteMemberEvent event = eventService.createInviteMemberEvent ( inviteRequest );
             kafkaProducer.sentMessage ( event );
-            saveInvitationDetailsToDatabase (event ,project,invitedUser);
+            MemberInvitation memberInvitation = createInvitation (event ,project,invitedUser);
+            invitationRepository.save ( memberInvitation );
             return ResponseEntity.ok ( BasicResponse.builder()
                             .status ( HttpStatus.OK.value ( ) )
                             .timestamp ( LocalDateTime.now () )
@@ -84,7 +85,7 @@ public class MemberInvitationService implements IMemberInvitationService{
 
         }
         catch (ResourceNotFoundException e) {
-            throw new RuntimeException ( e.getMessage () );
+            throw e;
         }
         catch (Exception e){
             throw new RuntimeException ( e.getMessage () );
@@ -110,14 +111,14 @@ public class MemberInvitationService implements IMemberInvitationService{
                  .collect( Collectors.toList());
         return ResponseEntity.ok ( responsesList );
         }catch (UserNotFoundException e){
-            throw new RuntimeException ( e.getMessage () );
+            throw e;
         }
         catch (Exception e){
             throw new RuntimeException ( e.getMessage () );
         }
     }
-    private void saveInvitationDetailsToDatabase (InviteMemberEvent event, Project project,User invitedUser) {
-      MemberInvitation memberInvitation =   MemberInvitation.builder ()
+    private MemberInvitation createInvitation (InviteMemberEvent event, Project project, User invitedUser) {
+      return    MemberInvitation.builder ()
                 .invitationToken ( event.getToken ( ) )
                 .inviteFrom ( invitedUser.getEmail () )
                 .createdAt ( new Date ( System.currentTimeMillis () ) )
@@ -127,6 +128,6 @@ public class MemberInvitationService implements IMemberInvitationService{
                 .status ( InvitationStatus.PENDING )
                 .project ( project )
                 .build ();
-        invitationRepository.save ( memberInvitation );
+
     }
 }
