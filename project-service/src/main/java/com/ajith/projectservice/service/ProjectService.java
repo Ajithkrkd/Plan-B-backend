@@ -48,12 +48,14 @@ public class ProjectService implements IProjectService{
                 }
                 Project project = mapperService.mapProjectRequestToProject ( projectRequest, validUser );
                 projectRepository.save ( project );
-                return ResponseEntity.ok( BasicResponse.builder()
-                        .message ( "Project created successfully" )
-                        .description ( "your project is created and assigned to you "+ validUser.getFullName () )
-                        .timestamp ( LocalDateTime.now () )
-                        .status ( HttpStatus.CREATED.value ( ) )
-                        .build());
+                return ResponseEntity.status ( HttpStatus.CREATED ).body (
+                        BasicResponse.builder()
+                                .message ( "Project created successfully" )
+                                .description ( "your project is created and assigned to you "+ validUser.getFullName () )
+                                .timestamp ( LocalDateTime.now () )
+                                .status ( HttpStatus.CREATED.value ( ) )
+                                .build()
+                );
 
         }
         catch (ResourceAlreadyExist e){

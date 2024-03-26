@@ -8,6 +8,7 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@ToString
 public class User {
     private long userId;
     private String fullName;
