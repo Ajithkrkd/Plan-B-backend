@@ -36,6 +36,7 @@ public class ProjectController {
     }
 
     @GetMapping("/{projectId}")
+    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity< ProjectDetailsResponse > getProjectByProjectId(
             @RequestHeader("Authorization") String authHeader,
             @PathVariable("projectId") String projectId
@@ -46,6 +47,7 @@ public class ProjectController {
 
 
     @GetMapping("/checkProjectIsExist")
+    @ResponseStatus(HttpStatus.OK)
     public boolean isProjectExist(@RequestParam Long projectId){
         return iProjectService.isProjectExist(projectId);
     }

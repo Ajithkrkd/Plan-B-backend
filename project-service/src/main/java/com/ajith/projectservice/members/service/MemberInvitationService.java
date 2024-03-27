@@ -66,6 +66,7 @@ public class MemberInvitationService implements IMemberInvitationService{
             }
             String invitationReceiverEmail = invitation.get().getInviteSentTo ();
             MemberInvitation invitationWantToUpdate = invitation.get ();
+
             Optional < Project > invitedProject = projectRepository.findById ( invitationWantToUpdate.getProject ().getId ());
             Project project = invitedProject.get ();
             project.getAssignedMembersIds ().add ( expectedUser.getUserId () );
@@ -130,4 +131,7 @@ public class MemberInvitationService implements IMemberInvitationService{
                 .build ();
 
     }
+
+
+
 }
